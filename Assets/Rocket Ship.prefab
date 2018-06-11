@@ -422,4 +422,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rcsThrust: 100
-  mainThrust: 1000
+  mainThrust: 2000

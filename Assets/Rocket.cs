@@ -9,6 +9,9 @@ public class Rocket : MonoBehaviour
     [SerializeField] float rcsThrust = 100f;
     [SerializeField] float mainThrust = 100f;
 
+    enum State { Alive, Dying, Transcending }
+    State state = State.Alive;
+
     // Use this for initialization
     void Start()
     {
@@ -19,6 +22,9 @@ public class Rocket : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (state != State.Alive) {
+            return;
+        }
         Thrust();
         Rotate();
     }
@@ -30,15 +36,30 @@ public class Rocket : MonoBehaviour
             case "Friendly":
                 break;
             case "Finish":
-                print("Hit Finish");
-                SceneManager.LoadScene(1);
+                audioSource.Stop();
+                state = State.Transcending;
+                Invoke("LoadNextScene", 1f);
                 break;
             default:
-                print("Dead");
-                SceneManager.LoadScene(0);
+                audioSource.Stop();
+                state = State.Dying;
+                Invoke("GoBackToStart", 1f);
                 break;
         }
     }
+
+    private void GoBackToStart()
+    {
+        SceneManager.LoadScene(0);
+        state = State.Alive;
+    }
+
+    private void LoadNextScene()
+    {
+        SceneManager.LoadScene(1);
+        state = State.Alive;
+    }
+
     private void Thrust()
     {
         float thrustThisFrame = mainThrust * Time.deltaTime;
