@@ -8,6 +8,9 @@ public class Rocket : MonoBehaviour
     
     [SerializeField] float rcsThrust = 100f;
     [SerializeField] float mainThrust = 100f;
+    [SerializeField] AudioClip mainEngine;
+    [SerializeField] AudioClip deathSound;
+    [SerializeField] AudioClip levelSound;
 
     enum State { Alive, Dying, Transcending }
     State state = State.Alive;
@@ -36,16 +39,28 @@ public class Rocket : MonoBehaviour
             case "Friendly":
                 break;
             case "Finish":
-                audioSource.Stop();
-                state = State.Transcending;
-                Invoke("LoadNextScene", 1f);
+                StartLevelSequence();
                 break;
             default:
                 audioSource.Stop();
-                state = State.Dying;
-                Invoke("GoBackToStart", 1f);
+                StartDeathSequence();
                 break;
         }
+    }
+
+    private void StartLevelSequence()
+    {
+        audioSource.Stop();
+        audioSource.PlayOneShot(levelSound);
+        state = State.Transcending;
+        Invoke("LoadNextScene", 1f);
+    }
+
+    private void StartDeathSequence()
+    {
+        audioSource.PlayOneShot(deathSound);
+        state = State.Dying;
+        Invoke("GoBackToStart", 1f);
     }
 
     private void GoBackToStart()
@@ -68,7 +83,7 @@ public class Rocket : MonoBehaviour
             rigidbody.AddRelativeForce(Vector3.up * thrustThisFrame);
             if (!audioSource.isPlaying)
             {
-                audioSource.Play();
+                audioSource.PlayOneShot(mainEngine);
             }
         }
         else
