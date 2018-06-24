@@ -16,6 +16,8 @@ public class Rocket : MonoBehaviour
     [SerializeField] ParticleSystem deathParticles;
     [SerializeField] ParticleSystem levelParticles;
 
+    [SerializeField] bool detectCollisions = true;
+
     enum State { Alive, Dying, Transcending }
     State state = State.Alive;
 
@@ -34,6 +36,7 @@ public class Rocket : MonoBehaviour
         }
         Thrust();
         Rotate();
+        DebugKeys();
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -46,8 +49,11 @@ public class Rocket : MonoBehaviour
                 StartLevelSequence();
                 break;
             default:
-                audioSource.Stop();
-                StartDeathSequence();
+                if (detectCollisions)
+                {
+                    audioSource.Stop();
+                    StartDeathSequence();
+                }
                 break;
         }
     }
@@ -115,5 +121,15 @@ public class Rocket : MonoBehaviour
             transform.Rotate(-Vector3.forward * rotationThisFrame);
         }
         rigidbody.freezeRotation = false; // resume physics control of rotation
+    }
+
+    private void DebugKeys()
+    {
+        if (Input.GetKeyDown(KeyCode.L)) {
+            LoadNextScene();
+        }
+        if (Input.GetKeyDown(KeyCode.C)) {
+            detectCollisions = !detectCollisions;
+        }
     }
 }
